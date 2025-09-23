@@ -12,6 +12,8 @@ from ASL_DNN import ASL_DNN
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+weight_dir = "C:\\Users\\horga\\Documents\\GitHub\\ASL_WithGUI\\weights"
+weight_path = os.path.join(weight_dir, "5_asd.pth")
 batch_size = 128
 epochs = 30
 #link_to_dataset = "debashishsau/aslamerican-sign-language-aplhabet-dataset" #this needs "ASL_Alphabet_Dataset", "asl_alphabet_train" to be joined
@@ -21,8 +23,8 @@ def prRed(s): print("\033[91m{}\033[00m".format(s))
 def prGreen(s): print("\033[92m{}\033[00m".format(s))
 def prYellow(s): print("\033[93m{}\033[00m".format(s))
 
-def train(model, train_loader, val_loader, epochs, optimizer, criterion, scheduler, weights_path="weights.pth"):
-    global device
+def train(model, train_loader, val_loader, epochs, optimizer, criterion, scheduler):
+    global device, weight_path
     best_val_acc = 0
     patience = 5
     trigger_times = 0
@@ -57,10 +59,15 @@ def train(model, train_loader, val_loader, epochs, optimizer, criterion, schedul
 
         scheduler.step(val_acc)
 
+        prGreen(f"Epoch {epoch + 1}/{epochs} | "
+                f"Loss: {running_loss / len(train_loader):.4f} | "
+                f"Train Acc: {train_acc:.2f}% | Train F1: {train_f1:.4f} | "
+                f"Val Acc: {val_acc:.2f}% | Val F1: {val_f1:.4f}")
+
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             trigger_times = 0
-            torch.save(model.state_dict(), weights_path)
+            torch.save(model.state_dict(), weight_path)
         else:
             trigger_times += 1
             print(f"No improvement for {trigger_times} epoch(s)")
@@ -69,10 +76,6 @@ def train(model, train_loader, val_loader, epochs, optimizer, criterion, schedul
             print("Early stopping triggered")
             break
 
-        prGreen(f"Epoch {epoch + 1}/{epochs} | "
-                f"Loss: {running_loss / len(train_loader):.4f} | "
-                f"Train Acc: {train_acc:.2f}% | Train F1: {train_f1:.4f} | "
-                f"Val Acc: {val_acc:.2f}% | Val F1: {val_f1:.4f}")
         print("-------------------------------------------------------------------------------------------------------")
 
 def evaluate(model, loader):
@@ -155,7 +158,7 @@ if __name__ == "__main__":
 
     start = datetime.now()
     print(f"Starting training ({start})")
-    train(model, train_loader, val_loader, epochs, optimizer, criterion, scheduler, "weights_4.pth")
+    train(model, train_loader, val_loader, epochs, optimizer, criterion, scheduler)
     end = datetime.now()
     print(f"Finished training ({end})")
     print(f"Total training time: {end - start}")

@@ -52,7 +52,7 @@ def on_submit():
         return
 
     result = predict_asl_dactyl_sign(file_path, img_path)
-    print(f"Predicted class: {result} - ({img_path_global})\n")
+    print(f"Predicted class: {result} - ({img_path_global})")
 
     ax.clear()
     ax.imshow(img_pil)
