@@ -12,8 +12,8 @@ from ASL_DNN import ASL_DNN
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-weight_dir = "C:\\Users\\horga\\Documents\\GitHub\\ASL_WithGUI\\weights"
-weight_path = os.path.join(weight_dir, "5_asd.pth")
+weights_dir = "C:\\Users\\horga\\Documents\\GitHub\\ASL_WithGUI\\weights"
+weights_path = os.path.join(weights_dir, "5_asd.pth")
 batch_size = 128
 epochs = 30
 #link_to_dataset = "debashishsau/aslamerican-sign-language-aplhabet-dataset" #this needs "ASL_Alphabet_Dataset", "asl_alphabet_train" to be joined
@@ -24,7 +24,7 @@ def prGreen(s): print("\033[92m{}\033[00m".format(s))
 def prYellow(s): print("\033[93m{}\033[00m".format(s))
 
 def train(model, train_loader, val_loader, epochs, optimizer, criterion, scheduler):
-    global device, weight_path
+    global device, weights_path
     best_val_acc = 0
     patience = 5
     trigger_times = 0
@@ -67,13 +67,13 @@ def train(model, train_loader, val_loader, epochs, optimizer, criterion, schedul
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             trigger_times = 0
-            torch.save(model.state_dict(), weight_path)
+            torch.save(model.state_dict(), weights_path)
         else:
             trigger_times += 1
-            print(f"No improvement for {trigger_times} epoch(s)")
+            prRed(f"No improvement for {trigger_times} epoch(s)")
 
         if trigger_times >= patience:
-            print("Early stopping triggered")
+            prRed("Early stopping triggered")
             break
 
         print("-------------------------------------------------------------------------------------------------------")
@@ -158,14 +158,15 @@ if __name__ == "__main__":
 
     start = datetime.now()
     print(f"Starting training ({start})")
-    train(model, train_loader, val_loader, epochs, optimizer, criterion, scheduler)
+    #train(model, train_loader, val_loader, epochs, optimizer, criterion, scheduler)
     end = datetime.now()
     print(f"Finished training ({end})")
-    print(f"Total training time: {end - start}")
+    print(f"Total training time: {end - start}\n")
     #endregion
 
     #region testing
     prYellow("TESTING\n")
-    test_acc, test_f1 = evaluate(model, test_loader, device)
+    model.load_state_dict(torch.load(weights_path, map_location=device))
+    test_acc, test_f1 = evaluate(model, test_loader)
     print(f"Test Acc: {test_acc:.2f}% | Test F1: {test_f1:.4f}")
     #endregion

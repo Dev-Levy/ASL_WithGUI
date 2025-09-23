@@ -9,6 +9,8 @@ from torchvision import transforms
 
 from ASL_DNN import ASL_DNN
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 img_pil = None
 img_path_global = None
 wraplength = 450
@@ -20,7 +22,7 @@ transform = transforms.Compose([
     transforms.Normalize((0.5,), (0.5,))
 ])
 
-#i could read these values by loading the dataset, but it's much quicker if i hardcode them
+# I could read these values by loading the dataset, but it's much quicker if i hardcode them
 #dataset_classes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'del', 'nothing', 'space'] #this was used with 'debashishsau' dataset
 dataset_classes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Nothing', 'O', 'P', 'Q', 'R', 'S', 'Space', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'] #this is used with 'kapillondhe' dataset
 
@@ -61,11 +63,10 @@ def on_submit():
     canvas.draw()
 
 def predict_asl_dactyl_sign(weights_path, img_path):
-    global transform, dataset_classes
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    global transform, dataset_classes, device
 
     num_classes = len(dataset_classes)
-    input_dim = 64*64*1
+    input_dim = 64*64
 
     model = ASL_DNN(input_dim,num_classes)
     model.load_state_dict(torch.load(weights_path, map_location=device))
