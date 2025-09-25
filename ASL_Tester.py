@@ -22,6 +22,7 @@ weights_dir = "C:\\Users\\horga\\Documents\\GitHub\\ASL_WithGUI\\weights"
 #weights_path = os.path.join(weights_dir, "5_asd.pth")
 
 def prYellow(s): print("\033[93m{}\033[00m".format(s))
+def prGreen(s): print("\033[92m{}\033[00m".format(s))
 
 def evaluate(model, loader):
     global device
@@ -68,4 +69,4 @@ if __name__ == "__main__":
     prYellow("TESTING\n")
     model.load_state_dict(torch.load(weights_path, map_location=device))
     test_acc, test_f1 = evaluate(model, test_loader)
-    print(f"Test Acc: {test_acc:.2f}% | Test F1: {test_f1:.4f}")
+    prGreen(f"Test Acc: {test_acc:.2f}% | Test F1: {test_f1:.4f}")

@@ -20,7 +20,6 @@ epochs = 30
 link_to_dataset = "kapillondhe/american-sign-language" # this needs "ASL_Dataset", "Train" or "Test" to be joined
 
 def prRed(s): print("\033[91m{}\033[00m".format(s))
-def prGreen(s): print("\033[92m{}\033[00m".format(s))
 def prYellow(s): print("\033[93m{}\033[00m".format(s))
 
 def train(model, train_loader, val_loader, epochs, optimizer, criterion, scheduler):
