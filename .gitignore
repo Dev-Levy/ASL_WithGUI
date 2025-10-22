@@ -1,0 +1,24 @@
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# PyCharm project settings
+.idea/
+
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Logs and temporary files
+*.log
+.DS_Store
+
+# Virtual environment config files
+.env
