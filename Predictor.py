@@ -7,7 +7,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from torchvision import transforms
 
-from ASL_DNN import ASL_DNN
+from Models.DNN_model import ASL_DNN
+from Models.CNN_model import ASL_CNN
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -53,7 +54,8 @@ def on_submit():
         print("Select both file and image first!")
         return
 
-    result = predict_asl_dactyl_sign(file_path, img_path)
+    model_type = model_choice.get()
+    result = predict_asl_dactyl_sign(file_path, img_path, model_type)
     print(f"Predicted class: {result} - ({img_path_global})")
 
     ax.clear()
@@ -62,13 +64,17 @@ def on_submit():
     ax.set_title(result, fontsize=16, color="white")
     canvas.draw()
 
-def predict_asl_dactyl_sign(weights_path, img_path):
+def predict_asl_dactyl_sign(weights_path, img_path, model_type):
     global transform, dataset_classes, device
 
     num_classes = len(dataset_classes)
     input_dim = 64*64
 
-    model = ASL_DNN(input_dim,num_classes)
+    if model_type == "DNN":
+        model = ASL_DNN(input_dim, num_classes)
+    else:
+        model = ASL_CNN(num_classes)
+
     model.load_state_dict(torch.load(weights_path, map_location=device))
     model.to(device)
     model.eval()
@@ -108,6 +114,14 @@ if __name__ == "__main__":
     ax.set_facecolor("none")
     canvas = FigureCanvasTkAgg(fig, master=root)
     canvas.get_tk_widget().pack(pady=10)
+
+    # --- Model toggle (DNN/CNN) ---
+    model_choice = tk.StringVar(value="DNN")  # default
+    toggle_frame = tk.Frame(root, bg="#003049")
+    toggle_frame.pack(pady=5)
+    tk.Label(toggle_frame, text="Select Model:", bg="#003049", fg="white").pack(side="left", padx=5)
+    tk.Radiobutton(toggle_frame, text="DNN", variable=model_choice, value="DNN", bg="#003049", fg="white", selectcolor="#003049").pack(side="left", padx=5)
+    tk.Radiobutton(toggle_frame, text="CNN", variable=model_choice, value="CNN", bg="#003049", fg="white", selectcolor="#003049").pack(side="left", padx=5)
 
     weight_label = tk.Label(root, text="Weight path: ",bg="#003049", fg="white", wraplength=wraplength)
     weight_label.pack(pady=5)
